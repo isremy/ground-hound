@@ -4,6 +4,6 @@ Presents an environment for training a DRL agent to traverse a grid-world and fi
 ## How to install Ground-Hound
 To install this repository, you will need to make use of Python's virtual environment feature and then do
 
-```pip install requirements.txt```
+```pip install -r requirements.txt```
 
 after activating the virtual environment.
