@@ -37,7 +37,7 @@ class AnimateGrid:
 		CLOCK = pygame.time.Clock()
 		
 		while True:
-			self.draw_grid(self.grid, self.rgb_dict)
+			self._draw_grid(self.grid, self.rgb_dict)
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					pygame.quit()
