@@ -1,3 +1,7 @@
+'''
+Demo grid world made in PyGame to use as reference
+'''
+
 import pygame
 import sys
 
