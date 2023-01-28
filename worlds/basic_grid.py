@@ -9,16 +9,16 @@ class BasicGrid:
 	This basic grid object will generate a square level of randomly placed obstacles
 	and rewards near obstacles.
 	"""
-	def __init__(self, grid_size=15, obs_size=3, obs_density="normal", seed=None) -> None:
+	def __init__(self, grid_size=15, obs_size=2, obs_density="normal", seed=None) -> None:
 		self.__grid_size = grid_size
 		self.__obs_size = obs_size
 		self.__density = obs_density
 		self.__seed = seed
 		self.__grid = [[0] * self.__grid_size for i in range(self.__grid_size)]
 		self.__densities_map = {"sparse": self.__grid_size / (self.__obs_size * 1), 
-													"normal": self.__grid_size / (self.__obs_size * 0.5), 
-													"dense":  self.__grid_size / (self.__obs_size * 0.25)
-												 }
+														"normal": self.__grid_size / (self.__obs_size * 0.5), 
+														"dense":  self.__grid_size / (self.__obs_size * 0.25)
+												 	 }
 
 		self.state_rgb_map = {-1:	(0, 0, 0),				# black
 													0:	(0, 200, 10),			# light green

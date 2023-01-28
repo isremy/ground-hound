@@ -6,7 +6,7 @@ from worlds.basic_grid import BasicGrid
 from animate_grid import AnimateGrid
 
 
-PIXEL_SIZE = 35	# Determines the size of a single square in the env grid
+PIXEL_SIZE = 20	# Determines the size of a single square in the env grid
 
 
 class TestHound():
@@ -19,7 +19,7 @@ class TestHound():
 		"""
 		Tests generation of the BasicGrid level
 		"""
-		basic_world = BasicGrid()
+		basic_world = BasicGrid(grid_size=30, obs_size=3, obs_density="dense")
 		env = basic_world.generate_level()
 		env_size = basic_world.get_size()
 		
