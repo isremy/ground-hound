@@ -1,2 +1,5 @@
+numpy
 pygame
 pytest
+stable-baselines3
+networkx

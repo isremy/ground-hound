@@ -2,11 +2,18 @@
 Test harness for world generation
 """
 
-from worlds.basic_grid import BasicGrid
+import matplotlib.pyplot as plt
+import networkx as nx
+from worlds.legacy_basic_grid import *
+from worlds.legacy_indoor_grid import *
+from worlds.basic_house import *
+from legacy_hound import Hound
 from animate_grid import AnimateGrid
+from stable_baselines3 import DQN
+from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.env_util import make_vec_env
 
-
-PIXEL_SIZE = 20	# Determines the size of a single square in the env grid
+PIXEL_SIZE = 25	# Determines the size of a single square in the env grid
 
 
 class TestHound():
@@ -19,13 +26,51 @@ class TestHound():
 		"""
 		Tests generation of the BasicGrid level
 		"""
-		basic_world = BasicGrid(grid_size=30, obs_size=3, obs_density="dense")
+		# basic_world = BasicGrid()
+		basic_world = BasicGrid(grid_size=12, obs_size=2, obs_density="normal", seed=None)
 		env = basic_world.generate_level()
 		env_size = basic_world.get_size()
 		
 		assert len(env) == env_size
+		print(basic_world.get_num_rewards())
+
 		length = env_size * PIXEL_SIZE
-		window = AnimateGrid(length, length, PIXEL_SIZE, env, 
-													basic_world.get_rgb_dict())
+		window = AnimateGrid(length, length, PIXEL_SIZE, 
+													BASIC_RGB_MAP, env)
 		window.animate()
+
+	
+	def test_basic_house(self):
+		env = BasicHouse()
 		
+		# Test living room
+		graph, grid = env._living_room()
+		nx.draw(graph, with_labels = True)
+		plt.show()
+		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, HOUSE_COLOR_MAP, grid)
+		window.animate()
+
+		# Test kitchen
+
+	def test_indoor_grid(self):
+		"""
+		Tests indoor grid environment
+		"""
+		print("\n")
+		basic_world = IndoorGrid()
+		env = basic_world.generate_level()
+		print(env)
+
+		# width, height = basic_world.room_dims()
+		
+		window = AnimateGrid(STATIC_WIDTH * PIXEL_SIZE, STATIC_HEIGHT * PIXEL_SIZE, PIXEL_SIZE, 
+													INDOOR_RGB_MAP, env)
+		window.animate()
+
+	def test_agent(self):
+		test_hound = Hound()
+		check_env(test_hound, warn=True) 
+		test_hound = make_vec_env(lambda: test_hound, n_envs=1)
+		model = DQN('MlpPolicy', test_hound, verbose=1, exploration_final_eps=0.1).learn(500_000)
+
+
