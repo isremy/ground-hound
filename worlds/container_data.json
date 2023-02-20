@@ -1,0 +1,148 @@
+{
+	"containers": [
+		{
+			"name": 			"empty",
+			"length":			1, 
+			"width":			1,
+			"cost":				0, 
+			"color": 			"#C0AEAB",
+			"space":			0
+		},
+
+		{
+			"name": 			"television",
+			"length":			3, 
+			"width":			1,
+			"cost":				1, 
+			"color": 			"#000000",
+			"space":			1
+		},
+
+		{
+			"name":				"coffee table",
+			"length":			3, 
+			"width":			1, 
+			"cost":				1,
+			"color": 			"#78281F",
+			"space":			2
+		},
+
+		{
+			"name": 			"cabinet",
+			"length":			2, 
+			"width":			1, 
+			"cost":				4,
+			"color": 			"#6E2C00",
+			"space":			6
+		},
+
+		{
+			"name": 			"couch",
+			"length":			4, 
+			"width":			2,
+			"cost":				4,
+			"color": 			"#34495E",
+			"space":			1
+		},
+
+		{
+			"name": 			"shelf",
+			"length":			2, 
+			"width":			1,
+			"cost":				4,
+			"color": 			"#784212",
+			"space":			6
+		},
+
+		{
+			"name":				"bathtub",
+			"length":			3,
+			"width":			2, 
+			"cost":				1,
+			"color":			"#C0392B",
+			"space":			2
+		},
+
+		{
+			"name": 			"bed",
+			"length":			4, 
+			"width":			2, 
+			"cost":				2,
+			"color":			"#6E2C00",
+			"space":			3
+
+		},
+		
+		{
+			"name": 			"desk",
+			"length":			2, 
+			"width":			1,
+			"cost":				2,
+			"color": 			"#78281F",
+			"space":			3
+		},
+
+		{
+			"name": 			"dishwasher",
+			"length":			3, 
+			"width":			1,
+			"cost":				2, 
+			"color": 			"#D7DBDD",
+			"space":			4
+		},
+
+		{
+			"name": 			"house plant",
+			"length":			1, 
+			"width":			1,
+			"cost":				1,
+			"color": 			"#52BE80",
+			"space":			1
+		},
+
+		{
+			"name": 			"oven",
+			"length":			2, 
+			"width":			2,
+			"cost":				1,
+			"color": 			"#000000",
+			"space":			2
+		},
+
+		{
+			"name": 			"sink",
+			"length":			2, 
+			"width":			1,
+			"cost":				1, 
+			"color": 			"#FDFEFE",
+			"space":			1
+		},
+
+		{
+			"name": 			"speaker",
+			"length":			1, 
+			"width":			1,
+			"cost":				1,
+			"color": 			"#000000",
+			"space":			0
+		},
+
+		{
+			"name": 			"table",
+			"length":			3, 
+			"width":			2,
+			"cost":				2, 
+			"color": 			"#000000",
+			"space":			4
+		},
+
+		{
+			"name":				"toilet",
+			"length":			1, 
+			"width":			1,
+			"cost":				3,
+			"color": 			"white",
+			"space":			3
+		}
+	]
+}

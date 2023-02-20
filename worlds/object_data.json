@@ -1,139 +1,29 @@
 {
-	"objects": [
-		{
-			"name":				"bathtub",
-			"length":			3,
-			"width":			2, 
-			"occlusion":	0,
-			"cost":				0,
-			"color":			"white"
-		},
+    "objects": [
+        {
+            "name": "remote"
+        },
 
-		{
-			"name": 			"bed",
-			"length":			4, 
-			"width":			2, 
-			"occlusion":	1,
-			"cost":				2,
-			"color":			"dark blue"
+        {
+            "name": "dvd"
+        },
 
-		},
-		
-		{
-			"name": 			"cabinet",
-			"length":			2, 
-			"width":			1, 
-			"occlusion":	1,
-			"cost":				1,
-			"color": 			"dark brown"
-		},
+        {
+            "name": "magazine"
+        },
 
-		{
-			"name":				"coffee table",
-			"length":			3, 
-			"width":			1, 
-			"occlusion":	1,
-			"cost":				1,
-			"color": 			"cyan"
-		},
+        {
+            "name": "plate"
+        },
 
-		{
-			"name": 			"couch",
-			"length":			4, 
-			"width":			2,
-			"occlusion":	1,
-			"cost":				2,
-			"color": 			"dark red"
-		},
+        {
+            "name": "cup"
+        },
 
-		{
-			"name": 			"desk",
-			"length":			2, 
-			"width":			1,
-			"occlusion":	1,
-			"cost":				1,
-			"color": 			"dark brown"
-		},
+        {
+            "name": "book"
+        }
 
-		{
-			"name": 			"dishwasher",
-			"length":			3, 
-			"width":			1,
-			"occlusion":	1,
-			"cost":				1, 
-			"color": 			"off white"
-		},
-
-		{
-			"name": 			"house plant",
-			"length":			1, 
-			"width":			1,
-			"occlusion":	0,
-			"cost":				0,
-			"color": 			"green"
-		},
-
-		{
-			"name": 			"oven",
-			"length":			2, 
-			"width":			2,
-			"occlusion":	1,
-			"cost":				1,
-			"color": 			"black"
-		},
-
-		{
-			"name": 			"shelf",
-			"length":			2, 
-			"width":			1,
-			"occlusion":	1,
-			"cost":				1,
-			"color": 			"light brown"
-		},
-
-		{
-			"name": 			"sink",
-			"length":			2, 
-			"width":			1,
-			"occlusion":	0,
-			"cost":				0, 
-			"color": 			"white"
-		},
-
-		{
-			"name": 			"speaker",
-			"length":			1, 
-			"width":			1,
-			"occlusion":	0,
-			"cost":				0,
-			"color": 			"black"
-		},
-
-		{
-			"name": 			"table",
-			"length":			3, 
-			"width":			2,
-			"occlusion":	0,
-			"cost":				0, 
-			"color": 			"black"
-		},
-
-		{
-			"name": 			"television",
-			"length":			3, 
-			"width":			1,
-			"occlusion":	0,
-			"cost":				0, 
-			"color": 			"black"
-		},
-
-		{
-			"name":				"toilet",
-			"length":			1, 
-			"width":			1,
-			"occlusion":	1,
-			"cost":				2,
-			"color": 			"white"
-		}
-	]
+    ]
+    
 }

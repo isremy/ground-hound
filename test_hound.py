@@ -47,7 +47,7 @@ class TestHound():
 		graph, grid = env._living_room()
 		nx.draw(graph, with_labels = True)
 		plt.show()
-		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, HOUSE_COLOR_MAP, grid)
+		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, env.CONTAINER_COLOR_MAP, grid)
 		window.animate()
 
 		# Test kitchen
