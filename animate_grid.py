@@ -2,6 +2,7 @@
 Contains Animation class to visualize environment
 """
 import pygame
+import numpy as np
 
 WHITE = (200, 200, 200)
 
@@ -26,7 +27,7 @@ class AnimateGrid:
 		i = 0
 		while True:
 			if i < num_frames:
-				self.grid = frames[i]
+				self.__grid = frames[i]
 				i += 1
 
 			self._draw_grid()
@@ -36,7 +37,7 @@ class AnimateGrid:
 					return
 
 			pygame.display.update()
-			pygame.time.wait(200)
+			pygame.time.wait(500)
 
 	def _draw_grid(self) -> None:
 		"""

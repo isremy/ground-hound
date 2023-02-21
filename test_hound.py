@@ -4,11 +4,13 @@ Test harness for world generation
 
 import matplotlib.pyplot as plt
 import networkx as nx
+import utils
 from worlds.legacy_basic_grid import *
 from worlds.legacy_indoor_grid import *
 from worlds.basic_house import *
-from legacy_hound import Hound
+from alpha_hound import Hound
 from animate_grid import AnimateGrid
+from sb3_contrib import RecurrentPPO
 from stable_baselines3 import DQN
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.env_util import make_vec_env
@@ -45,6 +47,13 @@ class TestHound():
 		
 		# Test living room
 		graph, grid = env._living_room()
+
+		# Test A* planner
+		start = (0, 0)
+		end = (2, 6)
+		path = utils.a_star(grid, start, end)
+		print([point for point in path])
+
 		nx.draw(graph, with_labels = True)
 		plt.show()
 		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, env.CONTAINER_COLOR_MAP, grid)
@@ -67,10 +76,13 @@ class TestHound():
 													INDOOR_RGB_MAP, env)
 		window.animate()
 
-	def test_agent(self):
-		test_hound = Hound()
+	def test_hound(self):		
+		test_hound = Hound(BasicHouse, "living room", "remote")
+		
 		check_env(test_hound, warn=True) 
 		test_hound = make_vec_env(lambda: test_hound, n_envs=1)
-		model = DQN('MlpPolicy', test_hound, verbose=1, exploration_final_eps=0.1).learn(500_000)
+		
+		model = RecurrentPPO('MlpLstmPolicy', test_hound, verbose=1).learn(500_000)
+
 
 

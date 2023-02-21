@@ -3,12 +3,6 @@ import random as rd
 import json
 import numpy as np
 
-
-# KITCHEN_GRID = [[]]
-
-# LIVING_ROOM_W = (8, 12)
-# LIVING_ROOM_L = (8, 12)
-
 class BasicHouse():
 	"""
 	Class for holding the data-structure representing a basic house environment.
@@ -35,17 +29,17 @@ class BasicHouse():
 			OBJECT_PROB = dict()
 			obj_list = np.array([obj_dat["name"] for obj_dat in self.__obj_data["objects"]])
 			np.random.seed(seed=cont_code)
-			obj_prob = np.random.dirichlet(np.ones(np.size(obj_list))*10)
+			obj_prob = np.random.dirichlet(np.ones(np.size(obj_list))*10) # parameter can be modified to determine skewedness
 			for idx,OBJ in enumerate(obj_list):
 				OBJECT_PROB[OBJ] = obj_prob[idx]
 			self.CONTAINER_PROB[cont_name] = OBJECT_PROB
 		np.random.seed()
 
 
-	def build_env_grph(self, **kwargs):
+	def build_env(self, **kwargs):
 		"""
-		Constructs and returns the scene graph for the environment.
-		:param: kwargs takes in a list of room-functions. This is to specify which room graphs to generate
+		Constructs and returns the scene graph and grid representation for the environment.
+		:param kwargs: Expects a list of room-functions. This is to specify which room graphs to generate
 		and add to the environment's whole scene graph.
 		"""
 
@@ -57,29 +51,30 @@ class BasicHouse():
 	def _living_room(self):
 		
 		# Generic representation of a living room
-		self.LIVING_ROOM_CONT = {	"couch0"		: "couch",
-							"coffee-table0" : "coffee table",
-							"cabinet0" 		: "cabinet",
-							"television0" 	: "television",
-							"shelf0"		: "shelf",
-							"shelf1"		: "shelf"}
+		self.LIVING_ROOM_CONT = {	"couch0"				: "couch",
+															"coffee_table0" : "coffee table",
+															"cabinet0" 			: "cabinet",
+															"television0" 	: "television",
+															"shelf0"				: "shelf",
+															"shelf1"				: "shelf"
+														}
 
 		# Container occupancy grid for living room
-		self.LIVING_ROOM_GRID = [[0, 0, 1, 1, 1, 1, 0, 0],
-								 [0, 0, 0, 0, 0, 0, 0, 0],
-								 [0, 5, 0, 0, 0, 0, 5, 0],
-								 [0, 0, 0, 2, 2, 0, 0, 0],
-								 [3, 0, 0, 2, 2, 0, 0, 0],
-								 [3, 0, 0, 0, 0, 0, 0, 0],
-								 [0, 0, 4, 4, 4, 4, 0, 0],
-								 [0, 0, 4, 4, 4, 4, 0, 0]]
+		self.LIVING_ROOM_GRID = [	[0, 0, 1, 1, 1, 1, 0, 0],
+															[0, 0, 0, 0, 0, 0, 0, 0],
+															[0, 5, 0, 0, 0, 0, 5, 0],
+															[0, 0, 0, 2, 2, 0, 0, 0],
+															[3, 0, 0, 2, 2, 0, 0, 0],
+															[3, 0, 0, 0, 0, 0, 0, 0],
+															[0, 0, 4, 4, 4, 4, 0, 0],
+															[0, 0, 4, 4, 4, 4, 0, 0]]
 
 		room_graph = nx.Graph()
 		room_graph.add_node("living room")
 		index = 0
 		for cont_k in self.LIVING_ROOM_CONT:
 			if self.LIVING_ROOM_CONT[cont_k] in [cont_dat["name"] for cont_dat in self.__cont_data["containers"]]:
-				
+				# Hand-picked locations for each container
 				location = (0, 0)
 				if cont_k == "couch0":
 					location = (6, 2)
@@ -87,14 +82,14 @@ class BasicHouse():
 					location = (0, 2)
 				elif cont_k == "cabinet0":
 					location = (4, 0)
-				elif cont_k == "coffee-table0":
+				elif cont_k == "coffee_table0":
 					location = (3, 3)
 				elif cont_k == "shelf0":
 					location = (2, 1)
 				elif cont_k == "shelf1":
 					location = (2, 6)
-				room_graph.add_nodes_from([(cont_k, {"cost" 			: self.__cont_data["containers"][index]["cost"], 
-													"location"	: location})])
+				room_graph.add_nodes_from([(cont_k, {	"cost" 			: self.__cont_data["containers"][index]["cost"], 
+																							"location"	: location})])
 				room_graph.add_edge("living room", cont_k)
 
 				# Add in objects by sampling CONT_PROB and space avilable
@@ -107,7 +102,6 @@ class BasicHouse():
 						room_graph.add_edge(cont_k, node_name)
 			
 			index += 1
-
 
 		return room_graph, self.LIVING_ROOM_GRID
 

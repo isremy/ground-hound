@@ -2,4 +2,5 @@ numpy
 pygame
 pytest
 stable-baselines3
+sb3-contrib
 networkx
