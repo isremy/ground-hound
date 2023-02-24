@@ -57,7 +57,7 @@ class TestHound():
 		nx.draw(graph, with_labels = True)
 		plt.show()
 		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, env.CONTAINER_COLOR_MAP, grid)
-		window.animate()
+		window.animate(frames=[grid] * 20, rewards=[[2.0]]*20)
 
 		# Test kitchen
 
@@ -77,7 +77,7 @@ class TestHound():
 		window.animate()
 
 	def test_hound(self):		
-		test_hound = Hound(BasicHouse, "living room", "remote")
+		test_hound = Hound(BasicHouse, "living room", "magazine")
 		
 		check_env(test_hound, warn=True) 
 		test_hound = make_vec_env(lambda: test_hound, n_envs=1)

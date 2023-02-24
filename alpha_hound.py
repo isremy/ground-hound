@@ -12,7 +12,7 @@ class Hound(gym.Env):
 	:param scene_parent: The root node of the scene graph to start from (such as a room or building)
 	:param target_obj: Object to locate and be rewarded for finding.
 	"""
-	def __init__(self, env, scene_parent, target_obj) -> None:
+	def __init__(self, env, scene_parent, target_obj, reward_callback=None) -> None:
 		super(Hound, self).__init__()
 		# TODO:	Alternative approach to terminal state definition: specifying number of target objects
 		#				and then defining the terminal state to be when all objects are found.
@@ -22,6 +22,7 @@ class Hound(gym.Env):
 		# 			container locations as observation.
 		self.__env_type = env
 		init_env = env()
+		self.__reward_callback=None
 		self.__scene_graph, self.__grid = init_env.build_env()
 		self.__scene_parent = scene_parent
 		self.__containers_list = [edge[1] for edge in self.__scene_graph.edges(self.__scene_parent)] # need to change this when adding high-level building node
@@ -33,6 +34,10 @@ class Hound(gym.Env):
 		self.__curr_pos = self.__start_pos
 		self.__num_cont_visited = 0
 		self.__grid[self.__start_pos[0]][self.__start_pos[1]] = -1 # Initialize agent on grid.
+
+		self.__cum_reward = 0
+		if reward_callback is not None:
+			self.__reward_callback = reward_callback
 
 		self.action_space = spaces.Discrete(self.__num_containers)
 		# observation = [grid space, agent-pos, container-0-location,...,reward-n-location]
@@ -52,6 +57,7 @@ class Hound(gym.Env):
 		self.__start_pos = (4, 7)
 		self.__curr_pos = self.__start_pos
 		self.__num_cont_visited = 0
+		self.__cum_reward = 0
 		self.__grid[self.__curr_pos[0]][self.__curr_pos[1]] = -1 # Initialize agent on grid.
 
 		self.action_space = spaces.Discrete(self.__num_containers)
@@ -97,7 +103,7 @@ class Hound(gym.Env):
 				# TODO: maybe play a little animation when a reward is found?
 				container_status[1] = True
 				obj_contained = True
-				reward += 10
+				reward += 1
 				remove_obj.append(edge[1])
 
 		if obj_contained:
@@ -107,11 +113,15 @@ class Hound(gym.Env):
 		if self.__num_cont_visited == self.__num_containers:
 			done = True
 
+		self.__cum_reward += reward
+		if self.__reward_callback is not None:
+			self.__reward_callback.callback(self.__cum_reward)
+
 		flattened_grid = (np.ndarray.flatten(np.array(self.__grid))).tolist()
 		obsv = flattened_grid + [self.__start_pos[0], self.__start_pos[1]] + (np.ndarray.flatten(np.array(self.__cont_locations))).tolist()
 
 		# Auxillary information dictionary
-		info = {0:self.__grid, 1:path, 2:container_status}
+		info = {0:self.__grid, 1:path, 2:container_status, 3:self.__scene_graph}
 
 		return np.array(obsv).astype(np.int32), reward, done, info
 

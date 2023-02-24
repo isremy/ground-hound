@@ -33,6 +33,8 @@ class BasicHouse():
 			for idx,OBJ in enumerate(obj_list):
 				OBJECT_PROB[OBJ] = obj_prob[idx]
 			self.CONTAINER_PROB[cont_name] = OBJECT_PROB
+			# print(obj_list)
+			# print("PROBABILITIES FOR ", cont_name.upper(), obj_prob)
 		np.random.seed()
 
 
@@ -71,38 +73,42 @@ class BasicHouse():
 
 		room_graph = nx.Graph()
 		room_graph.add_node("living room")
-		index = 0
+
 		for cont_k in self.LIVING_ROOM_CONT:
-			if self.LIVING_ROOM_CONT[cont_k] in [cont_dat["name"] for cont_dat in self.__cont_data["containers"]]:
-				# Hand-picked locations for each container
-				location = (0, 0)
-				if cont_k == "couch0":
-					location = (6, 2)
-				elif cont_k == "television0":
-					location = (0, 2)
-				elif cont_k == "cabinet0":
-					location = (4, 0)
-				elif cont_k == "coffee_table0":
-					location = (3, 3)
-				elif cont_k == "shelf0":
-					location = (2, 1)
-				elif cont_k == "shelf1":
-					location = (2, 6)
-				room_graph.add_nodes_from([(cont_k, {	"cost" 			: self.__cont_data["containers"][index]["cost"], 
-																							"location"	: location})])
-				room_graph.add_edge("living room", cont_k)
-
-				# Add in objects by sampling CONT_PROB and space avilable
-				if self.__cont_data["containers"][index]["space"] > 0:
-					for num_obj in range(np.random.randint(0,self.__cont_data["containers"][index]["space"])):
-						OBJ_PROB = self.CONTAINER_PROB[self.__cont_data["containers"][index]["name"]]
-						obj_name = list(OBJ_PROB.keys())[np.random.choice(range(len(list(OBJ_PROB.values()))),p=list(OBJ_PROB.values()))]
-						node_name = cont_k + " - " +str(num_obj) + ": " + obj_name
-						room_graph.add_nodes_from([(node_name, {"object" 			: obj_name})])
-						room_graph.add_edge(cont_k, node_name)
+			index = 0
+			for cont_dat in self.__cont_data["containers"]:
+				if self.LIVING_ROOM_CONT[cont_k] == cont_dat["name"]:
+					break
+				index += 1
 			
-			index += 1
+			# Hand-picked locations for each container
+			location = (0, 0)
+			if cont_k == "couch0":
+				location = (6, 2)
+			elif cont_k == "television0":
+				location = (0, 2)
+			elif cont_k == "cabinet0":
+				location = (4, 0)
+			elif cont_k == "coffee_table0":
+				location = (3, 3)
+			elif cont_k == "shelf0":
+				location = (2, 1)
+			elif cont_k == "shelf1":
+				location = (2, 6)
+			room_graph.add_nodes_from([(cont_k, {	"cost" 			: self.__cont_data["containers"][index]["cost"], 
+																						"location"	: location})])
+			room_graph.add_edge("living room", cont_k)
 
+			# Add in objects by sampling CONT_PROB and space avilable
+			if self.__cont_data["containers"][index]["space"] > 0:
+				# print("SPACE IN ", cont_k,": ", self.__cont_data["containers"][index]["space"])
+				for num_obj in range(np.random.randint(0,self.__cont_data["containers"][index]["space"])):
+					OBJ_PROB = self.CONTAINER_PROB[self.__cont_data["containers"][index]["name"]]
+					obj_name = list(OBJ_PROB.keys())[np.random.choice(range(len(list(OBJ_PROB.values()))),p=list(OBJ_PROB.values()))]
+					node_name = cont_k + "_" +str(num_obj) + "_" + obj_name
+					room_graph.add_nodes_from([(node_name, {"object" 			: obj_name})])
+					room_graph.add_edge(cont_k, node_name)
+			
 		return room_graph, self.LIVING_ROOM_GRID
 
 	def _bathroom(self):
