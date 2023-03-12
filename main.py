@@ -83,6 +83,13 @@ def find_upper_bound(num_eps,upper_env,target_obj):
 		grid_shape = np.shape(grid)
 		np.random.seed(seed = ep)
 		agent_pos = [np.random.randint(0, grid_shape[0]),np.random.randint(0, grid_shape[1])]
+
+		while True:
+			if grid[agent_pos[0]][agent_pos[1]] != 0:
+				agent_pos[0] = np.random.randint(0, grid_shape[0])
+				agent_pos[1] = np.random.randint(0, grid_shape[1])
+			else:
+				break
 		
 		# Find all target containers and objects
 		cont_list = ["couch0","coffee_table0","cabinet0","television0","shelf0","shelf1"]
@@ -96,7 +103,7 @@ def find_upper_bound(num_eps,upper_env,target_obj):
 		for container in (cont_dict):
 			path = a_star(grid,agent_pos,cont_dict[container])
 			cum_reward -= 0.02 * len(path)
-			agent_pos = cont_dict[container]
+			agent_pos = path[-1]
 
 		# Mean rewards calculated every 20 eps
 		if ep > 0 and (ep + 1) % 20 == 0:
@@ -134,6 +141,8 @@ def train(log_dir: str, num_steps: int=10_000, use_dist: bool=False) -> None:
 	timestep_len = len(mean_rewards_list)
 
 	upper_reward = find_upper_bound(len(mean_rewards_list)*20,BasicHouse,"magazine")
+	# print(upper_reward[0:100])
+	# print(mean_rewards_list[0:100])
 
 	df = pd.DataFrame({"Timesteps": np.linspace(0, num_steps, timestep_len),"Average Episode Reward": mean_rewards_list, "Oracle Epsiode Reward (Upper Bound)": upper_reward})
 	df = pd.melt(df,id_vars=["Timesteps"],value_vars=["Average Episode Reward","Oracle Epsiode Reward (Upper Bound)"])

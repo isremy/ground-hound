@@ -37,7 +37,7 @@ class Hound(gym.Env):
 		self.__use_dist = use_dist
 		self.__start_pos = [np.random.randint(0, self.__grid_shape[0]), np.random.randint(0, self.__grid_shape[1])]
 
-		# placed = False
+		placed = False
 		while True:
 			if self.__grid[self.__start_pos[0]][self.__start_pos[1]] != 0:
 				self.__start_pos[0] = np.random.randint(0, self.__grid_shape[0])
