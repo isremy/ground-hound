@@ -3,6 +3,7 @@ from alpha_hound.alpha_hound import Hound
 
 import numpy as np
 import networkx as nx
+from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -31,6 +32,7 @@ class RewardCollectionCallback(BaseCallback):
 		super(RewardCollectionCallback, self).__init__(verbose)
 		self.check_freq = check_freq
 		self.log_dir = log_dir
+		print(log_dir)
 		self.save_path = os.path.join(log_dir, "r_log")
 		self.rewards = rewards
 	
@@ -64,15 +66,15 @@ RGB_DICT = { -2:	"#A56A84",
 						}
 
 
-def train(num_steps: int=10_000) -> None:
+def train(log_dir: str, num_steps: int=10_000, use_dist: bool=False) -> None:
 	"""
 	Performs one learning run over some number of timesteps
 	"""
 	
 	mean_rewards_list = []
-	log_dir = "models/alpha_d_0.0.1/"
+	# log_dir = "models/alpha_d_0.0.1/"
 	reward_data_obj = RewardCollectionCallback(mean_rewards_list, 200, log_dir)
-	test_hound = Hound(BasicHouse, "living room", "magazine")
+	test_hound = Hound(BasicHouse, "living room", "magazine", use_dist=use_dist)
 	check_env(test_hound, warn=True) 
 
 	test_hound = Monitor(test_hound, log_dir)
@@ -80,7 +82,8 @@ def train(num_steps: int=10_000) -> None:
 	# model = RecurrentPPO('MlpLstmPolicy', test_hound, verbose=1)
 	model = PPO('MlpPolicy', test_hound, verbose=1)
 	model.learn(num_steps, reward_data_obj)
-	model.save("models/alpha_d_0.0.1/alpha_d_0.0.1_model")
+	model.save(log_dir + "/model")
+	# model.save("models/alpha_d_0.0.1/alpha_d_0.0.1_model")
 	
 	timestep_len = len(mean_rewards_list)
 
@@ -89,18 +92,19 @@ def train(num_steps: int=10_000) -> None:
 	sns.set(style="darkgrid", font_scale=0.8)
 	sns.lineplot(x="Timesteps", y = "Average Episode Reward", data=plot, errorbar="ci", err_style="band")
 
-	plt.savefig("models/alpha_d_0.0.1/reward_plot.png")
+	plt.savefig(log_dir + "/reward_plot.png")
 	# plot_results([log_dir], num_steps, results_plotter.X_TIMESTEPS, "TD3 LunarLander")
 
 	plt.show()
 
 
-def test_model(visuals: bool = False) -> list:
+def test_model(log_dir: str, visuals: bool = False) -> list:
 	# reward_data_obj = RewardCollectionCallback()
 	test_hound = Hound(BasicHouse, "living room", "magazine")
 	env = test_hound
 	test_hound = make_vec_env(lambda: test_hound, n_envs=1)
-	model = PPO.load("models/alpha_nd_0.0.1/alpha_nd_0.0.1_model", env)
+	model = PPO.load(log_dir + "/model", env)	
+	# model = PPO.load("models/alpha_nd_0.0.1/alpha_nd_0.0.1_model", env)
 	
 	vec_env = model.get_env()
 	mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
@@ -216,18 +220,33 @@ if __name__ == "__main__":
 	"""
 	Save data on search policies from many learning runs
 	"""
-	parser = argparse.ArgumentParser(description="Log search policy over a large number of training sessions")
-	parser.add_argument('--log', help="Specify that you want to log over large number of learned search policies")
+	parser = argparse.ArgumentParser(description="This program needs parameters to specify things")
+	parser.add_argument('-l', '--log', default=False, action="store_true", help="Specify that you want to log over large number of learned search policies. Agent must have been previously trained")
+	parser.add_argument('-d', '--distance', default=False, action="store_true", help="Specify that agent will incur penalty for distance")
+	parser.add_argument('-t', '--test', default=False, action="store_true", help="Test an agent")
+	parser.add_argument('-n', '--num-steps', type=int, default=200_000, help="Number of training steps")
+	parser.add_argument('-m', '--model-path', type=str, help="Path to save model data to")
 	args, leftovers = parser.parse_known_args()
 
-	if args.log is not None:
+	use_dist = False
+	if args.distance:
+		use_dist = True
+
+	test_agent = False
+	if args.test:
+		test_agent = True
+
+	num_steps = args.num_steps
+	log_dir = args.model_path
+
+	if args.log:
 		with open("./runs_data.csv", "w") as file:
 			tests_data = dict()
 			writer = csv.writer(file)
 			writer.writerow(["Iteration", "Action_1", "Action_2", "Action_3", "Action_4", "Action_5", "Action_6"])
 			
 			for iter in range(NUM_RUNS):
-				test_data = test_model()
+				test_data = test_model(log_dir)
 				tests_data[iter] = test_data
 				writer.writerow([iter + 1] + test_data)
 
@@ -236,5 +255,7 @@ if __name__ == "__main__":
 		plot_search_histogram()
 	
 	else:
-		train(num_steps=100_000)
-		# test_model(visuals=True)
+		if test_agent:
+			test_model(log_dir, visuals=True)
+		else:
+			train(log_dir, num_steps=num_steps, use_dist=use_dist)

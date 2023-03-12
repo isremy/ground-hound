@@ -5,3 +5,4 @@
 /.vscode
 /runs_data.csv
 /models
+/alpha_hound/__pycache__
