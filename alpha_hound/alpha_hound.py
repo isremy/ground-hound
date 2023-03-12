@@ -13,7 +13,7 @@ class Hound(gym.Env):
 	:param scene_parent: The root node of the scene graph to start from (such as a room or building)
 	:param target_obj: Object to locate and be rewarded for finding.
 	"""
-	def __init__(self, env, scene_parent, target_obj, reward_callback=None) -> None:
+	def __init__(self, env, scene_parent, target_obj: str, use_dist: bool=False) -> None:
 		super(Hound, self).__init__()
 		self.__current_step = 0
 		# TODO:	Alternative approach to terminal state definition: specifying number of target objects
@@ -34,6 +34,7 @@ class Hound(gym.Env):
 		self.__grid_shape = np.shape(self.__grid)
 
 		np.random.seed(seed = self.__current_step)
+		self.__use_dist = use_dist
 		self.__start_pos = [np.random.randint(0, self.__grid_shape[0]), np.random.randint(0, self.__grid_shape[1])]
 
 		# placed = False
@@ -48,10 +49,6 @@ class Hound(gym.Env):
 		self.__num_cont_visited = 0
 		self.__grid[self.__start_pos[0]][self.__start_pos[1]] = -1 # Initialize agent on grid.
 		self.__actions_taken = set()
-
-		self.__cum_reward = 0
-		if reward_callback is not None:
-			self.__reward_callback = reward_callback
 
 		self.action_space = spaces.Discrete(self.__num_containers + 1)
 		# observation = [grid space, agent-pos, container-0-location,...,reward-n-location]
@@ -82,7 +79,6 @@ class Hound(gym.Env):
 				break
 		self.__curr_pos = self.__start_pos
 		self.__num_cont_visited = 0
-		self.__cum_reward = 0
 		self.__grid[self.__curr_pos[0]][self.__curr_pos[1]] = -1 # Initialize agent on grid.
 		self.__actions_taken = set()
 		action = self.__num_containers
@@ -111,14 +107,14 @@ class Hound(gym.Env):
 		# if action in self.__actions_taken and action != self.__num_containers:
 		# print(type(action))
 		# print(action)
-		if action in self.__actions_taken:
+		if action in self.__actions_taken and self.__num_containers not in self.__actions_taken:
 			reward -= 1
 		# else:
 		# 	reward += 0.05
 
 		self.__actions_taken.add(action)
 
-		if action < self.__num_containers:
+		if action < self.__num_containers and self.__num_containers not in self.__actions_taken:
 			location = self.__cont_locations[action]
 			# Check that there is no confusion about which container is being picked.
 			assert location == self.__scene_graph.nodes[self.__containers_list[action]]["location"]
@@ -133,7 +129,7 @@ class Hound(gym.Env):
 			
 			
 			# TODO: Investigate tweaking penalties for removing occlusion and path planning
-			reward -= 0.02 * len(path)
+			if self.__use_dist: reward -= 0.02 * len(path)
 			# reward -= cost
 
 			remove_obj = []
@@ -152,12 +148,9 @@ class Hound(gym.Env):
 				self.__scene_graph.remove_nodes_from(remove_obj)
 	
 		# TODO: Investigate using number of target objects as terminal state.
-		if self.__num_cont_visited == self.__num_containers or action == self.__num_containers:
+		# if self.__num_cont_visited == self.__num_containers or action == self.__num_containers:
+		if self.__num_cont_visited == 10:
 			done = True
-
-		self.__cum_reward += reward
-		if self.__reward_callback is not None:
-			self.__reward_callback.callback(self.__cum_reward)
 
 		flattened_grid = (np.ndarray.flatten(np.array(self.__grid))).tolist()
 		obsv = flattened_grid + [action] + [self.__start_pos[0], self.__start_pos[1]] + (np.ndarray.flatten(np.array(self.__cont_locations))).tolist()
