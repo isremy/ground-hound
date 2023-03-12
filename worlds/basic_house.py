@@ -35,8 +35,6 @@ class BasicHouse():
 			self.CONTAINER_PROB[cont_name] = OBJECT_PROB
 			# print(obj_list)
 			# print("PROBABILITIES FOR ", cont_name.upper(), obj_prob)
-		np.random.seed()
-
 
 	def build_env(self, **kwargs):
 		"""
@@ -44,15 +42,24 @@ class BasicHouse():
 		:param kwargs: Expects a list of room-functions. This is to specify which room graphs to generate
 		and add to the environment's whole scene graph.
 		"""
-		self.HOUSE_GRID, self.__graph = self._living_room()
+
+		# Make sure to record if no seed is passed in
+		if 'seed' not in kwargs:
+			kwargs['seed'] = None
+
+		self.HOUSE_GRID, self.__graph = self._living_room(kwargs['seed'])
 
 		return self.HOUSE_GRID, self.__graph
 	
 
-	def _living_room(self):
+	def _living_room(self,seed=None):
 		"""
 		Randomly generates the grid and object graph for a living room environment
 		"""
+		if seed != None:
+			np.random.seed(seed=seed)
+			rd.seed(seed)
+
 # add a binary signal for ecery container to indicate search status
 # increase horizon limit to be rather large
 		# Define min and max number of each furniture item
