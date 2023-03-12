@@ -21,6 +21,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.results_plotter import load_results, ts2xy, plot_results
 from stable_baselines3.common.logger import Figure
+from utils import a_star
 
 
 NUM_RUNS = 50
@@ -64,6 +65,50 @@ RGB_DICT = { -2:	"#A56A84",
 						}
 
 
+def find_upper_bound(num_eps,upper_env,target_obj):
+	"""
+	Find oracles reward for each train epsiode
+	"""
+	env = upper_env()
+	mean_rewards = []
+	cum_reward = 0
+	for ep in range(num_eps):
+		cont_dict = {}
+		grid,scene_graph = env.build_env(seed = ep)
+		
+		# Add in agent for a given position
+		grid_shape = np.shape(grid)
+		np.random.seed(seed = ep)
+		agent_pos = [np.random.randint(0, grid_shape[0]),np.random.randint(0, grid_shape[1])]
+		
+		# Find all target containers and objects
+		cont_list = ["couch0","coffee_table0","cabinet0","television0","shelf0","shelf1"]
+		for container in cont_list:
+			for content in scene_graph.neighbors(container):
+				if target_obj in content: 
+					cont_dict[container] = scene_graph.nodes[container]["location"]
+					cum_reward += 1
+		
+		# Penalize distance
+		for container in (cont_dict):
+			path = a_star(grid,agent_pos,cont_dict[container])
+			cum_reward -= 0.02 * len(path)
+			agent_pos = cont_dict[container]
+
+		# Mean rewards calculated every 20 eps
+		if ep > 0 and (ep + 1) % 20 == 0:
+			mean_rewards.append(cum_reward/200)
+			cum_reward = 0	 
+		
+
+	return mean_rewards
+
+def find_lower_bound(num_eps,lower_env):
+	"""
+	Find oracles reward for each train epsiode
+	"""
+	pass
+
 def train(num_steps: int=10_000) -> None:
 	"""
 	Performs one learning run over some number of timesteps
@@ -84,10 +129,12 @@ def train(num_steps: int=10_000) -> None:
 	
 	timestep_len = len(mean_rewards_list)
 
-	plot = pd.DataFrame({"Average Episode Reward": mean_rewards_list, "Timesteps": np.linspace(0, num_steps, timestep_len)})
-	
+	upper_reward = find_upper_bound(len(mean_rewards_list)*20,BasicHouse,"magazine")
+
+	df = pd.DataFrame({"Timesteps": np.linspace(0, num_steps, timestep_len),"Average Episode Reward": mean_rewards_list, "Oracle Epsiode Reward (Upper Bound)": upper_reward})
+	df = pd.melt(df,id_vars=["Timesteps"],value_vars=["Average Episode Reward","Oracle Epsiode Reward (Upper Bound)"])
 	sns.set(style="darkgrid", font_scale=0.8)
-	sns.lineplot(x="Timesteps", y = "Average Episode Reward", data=plot, errorbar="ci", err_style="band")
+	sns.lineplot(x="Timesteps", y = "value", hue = "variable",data=df, errorbar="ci", err_style="band")
 
 	plt.savefig("models/alpha_d_0.0.1/reward_plot.png")
 	# plot_results([log_dir], num_steps, results_plotter.X_TIMESTEPS, "TD3 LunarLander")
@@ -236,5 +283,5 @@ if __name__ == "__main__":
 		plot_search_histogram()
 	
 	else:
-		train(num_steps=100_000)
+		train(num_steps=50000)
 		# test_model(visuals=True)

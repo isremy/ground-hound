@@ -15,6 +15,7 @@ class Hound(gym.Env):
 	"""
 	def __init__(self, env, scene_parent, target_obj, reward_callback=None) -> None:
 		super(Hound, self).__init__()
+		self.__current_step = 0
 		# TODO:	Alternative approach to terminal state definition: specifying number of target objects
 		#				and then defining the terminal state to be when all objects are found.
 		#				The current method simply has the agent try to maximize its reward from object search, rather than maximize
@@ -24,14 +25,15 @@ class Hound(gym.Env):
 		self.__env_type = env
 		init_env = env()
 		self.__reward_callback=None
-		self.__grid, self.__scene_graph = init_env.build_env()
+		self.__grid, self.__scene_graph = init_env.build_env(seed = self.__current_step)
 		self.__scene_parent = scene_parent
 		self.__containers_list = [edge[1] for edge in self.__scene_graph.edges(self.__scene_parent)] # need to change this when adding high-level building node
 		self.__cont_locations = [self.__scene_graph.nodes[container]["location"] for container in self.__containers_list]
 		self.__num_containers = len(self.__containers_list)
 		self.__target_obj = target_obj
 		self.__grid_shape = np.shape(self.__grid)
-		
+
+		np.random.seed(seed = self.__current_step)
 		self.__start_pos = [np.random.randint(0, self.__grid_shape[0]), np.random.randint(0, self.__grid_shape[1])]
 
 		# placed = False
@@ -59,14 +61,16 @@ class Hound(gym.Env):
 
 
 	def reset(self):
+		self.__current_step += 1
 		self.__curr_pos = self.__start_pos
 		init_env = self.__env_type()
-		self.__grid, self.__scene_graph = init_env.build_env()
+		self.__grid, self.__scene_graph = init_env.build_env(seed = self.__current_step)
 		self.__containers_list = [edge[1] for edge in self.__scene_graph.edges(self.__scene_parent)]
 		self.__num_containers = len(self.__containers_list)
 		self.__cont_locations = [self.__scene_graph.nodes[container]["location"] for container in self.__containers_list]
 		self.__grid_shape = np.shape(self.__grid)
 
+		np.random.seed(seed = self.__current_step)
 		self.__start_pos[0] = np.random.randint(0, self.__grid_shape[0])
 		self.__start_pos[1] = np.random.randint(0, self.__grid_shape[1])
 
