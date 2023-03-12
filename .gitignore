@@ -3,3 +3,5 @@
 /.pytest_cache
 /worlds/__pycache__
 /.vscode
+/runs_data.csv
+/models

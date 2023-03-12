@@ -36,7 +36,7 @@ def a_star(grid, start, end):
 
 	while open_list:
 		current_node = heapq.heappop(open_list)
-
+		# spare_list.append((current_node.x, current_node.y))
 		# if current_node.x == end_node.x and current_node.y == end_node.y:
 		if _euclid_distance(current_node, end_node) < 2:	
 			path = []
@@ -59,7 +59,7 @@ def a_star(grid, start, end):
 				if neighbor not in open_list:
 					heapq.heappush(open_list, neighbor)
 
-	return None
+	return []
 
 def calc_dist(p1, p2):
 	"""
@@ -85,6 +85,7 @@ def _get_neighbors(grid, node):
 	neighbors = []
 	for dx, dy in [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, 1), (1, -1)]:
 		x2, y2 = node.x + dx, node.y + dy
-		if 0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]) and grid[x2][y2] == 0:
+		# if 0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]) and grid[x2][y2] == 0:
+		if 0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]):
 			neighbors.append(Node(x2, y2))
 	return neighbors

@@ -11,7 +11,7 @@
 
 		{
 			"name": 			"television",
-			"length":			3, 
+			"length":			4, 
 			"width":			1,
 			"cost":				1, 
 			"color": 			"#000000",
@@ -19,9 +19,9 @@
 		},
 
 		{
-			"name":				"coffee table",
-			"length":			3, 
-			"width":			1, 
+			"name":				"coffee_table",
+			"length":			2, 
+			"width":			2, 
 			"cost":				1,
 			"color": 			"#78281F",
 			"space":			2
@@ -47,7 +47,7 @@
 
 		{
 			"name": 			"shelf",
-			"length":			2, 
+			"length":			1, 
 			"width":			1,
 			"cost":				4,
 			"color": 			"#784212",
@@ -92,7 +92,7 @@
 		},
 
 		{
-			"name": 			"house plant",
+			"name": 			"house_plant",
 			"length":			1, 
 			"width":			1,
 			"cost":				1,

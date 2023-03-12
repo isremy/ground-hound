@@ -8,7 +8,8 @@ import utils
 from worlds.legacy_basic_grid import *
 from worlds.legacy_indoor_grid import *
 from worlds.basic_house import *
-from alpha_hound import Hound
+# from alpha_hound.alpha_hound import Hound
+from beta_hound.beta_hound import Hound
 from animate_grid import AnimateGrid
 from sb3_contrib import RecurrentPPO
 from stable_baselines3 import DQN
@@ -46,18 +47,22 @@ class TestHound():
 		env = BasicHouse()
 		
 		# Test living room
-		graph, grid = env._living_room()
+		grid, graph = env._living_room()
 
 		# Test A* planner
-		start = (0, 0)
-		end = (2, 6)
+		start = (5, 7)
+		
+		while grid[start[0]][start[1]] != 0:
+			start = (np.random.randint(0, len(grid)), np.random.randint(0, len(grid)))
+
+		end = (0, 0)
 		path = utils.a_star(grid, start, end)
 		print([point for point in path])
 
 		nx.draw(graph, with_labels = True)
 		plt.show()
 		window = AnimateGrid(len(grid[0]) * PIXEL_SIZE, len(grid) * PIXEL_SIZE, PIXEL_SIZE, env.CONTAINER_COLOR_MAP, grid)
-		window.animate(frames=[grid] * 20, rewards=[[2.0]]*20)
+		window.animate()
 
 		# Test kitchen
 
@@ -83,6 +88,4 @@ class TestHound():
 		test_hound = make_vec_env(lambda: test_hound, n_envs=1)
 		
 		model = RecurrentPPO('MlpLstmPolicy', test_hound, verbose=1).learn(500_000)
-
-
-
+		
