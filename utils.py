@@ -4,6 +4,7 @@ Utility functions and A* path planner
 
 import numpy as np
 import heapq
+from itertools import permutations
 
 class Node:
 	def __init__(self, x, y, f=float('inf'), g=float('inf')):
@@ -89,3 +90,21 @@ def _get_neighbors(grid, node):
 		if 0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]):
 			neighbors.append(Node(x2, y2))
 	return neighbors
+
+
+def tsp_solver_bb(distances: list) -> list:
+	"""
+	Solves Travelling Salesman Problem exactly with distance as cost
+	via the Branch & Bound algorithm. O(n!) complexity.
+	"""
+	cities = set(range(len(distances)))
+	shortest_route = None
+	shortest_distance = float('inf')
+	for permutation in permutations(cities):
+		distance = 0
+		for i in range(len(permutation) - 1):
+			distance += distances[permutation[i]][permutation[i+1]]
+		if distance < shortest_distance:
+			shortest_distance = distance
+			shortest_route = permutation
+	return shortest_route, shortest_distance

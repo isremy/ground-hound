@@ -2,14 +2,15 @@
 Test harness for world generation
 """
 
+from agent_main import find_upper_bound
 import matplotlib.pyplot as plt
 import networkx as nx
 import utils
 from worlds.legacy_basic_grid import *
 from worlds.legacy_indoor_grid import *
 from worlds.basic_house import *
-# from alpha_hound.alpha_hound import Hound
-from beta_hound.beta_hound import Hound
+from alpha_hound.alpha_hound import Hound
+# from beta_hound.beta_hound import Hound
 from animate_grid import AnimateGrid
 from sb3_contrib import RecurrentPPO
 from stable_baselines3 import DQN
@@ -65,6 +66,17 @@ class TestHound():
 		window.animate()
 
 		# Test kitchen
+
+
+	def test_oracle(self):
+		TS = 10
+		test_hound = Hound(BasicHouse, "living room", "magazine", use_dist=True)
+		for i in range(TS):
+			test_hound.reset()
+		print("\n\n\n")
+
+		find_upper_bound(TS, BasicHouse, "magazine")
+
 
 	def test_indoor_grid(self):
 		"""

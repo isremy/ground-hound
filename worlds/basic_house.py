@@ -47,6 +47,7 @@ class BasicHouse():
 		if 'seed' not in kwargs:
 			kwargs['seed'] = None
 
+		# print(kwargs['seed'])
 		self.HOUSE_GRID, self.__graph = self._living_room(kwargs['seed'])
 
 		return self.HOUSE_GRID, self.__graph
@@ -56,6 +57,9 @@ class BasicHouse():
 		"""
 		Randomly generates the grid and object graph for a living room environment
 		"""
+		# obj_list = np.array([obj_dat["name"] for obj_dat in self.__obj_data["objects"]])
+		# obj_num_dict = {}
+
 		if seed != None:
 			np.random.seed(seed=seed)
 			rd.seed(seed)
@@ -136,12 +140,18 @@ class BasicHouse():
 							node_name = key + "_" +str(num_obj) + "_" + obj_name
 							room_graph.add_nodes_from([(node_name, {"object" 			: obj_name})])
 							room_graph.add_edge(key, node_name)
+							# if obj_name not in obj_num_dict:
+							# 	obj_num_dict[obj_name] = 0
+							# else:
+							# 	obj_num_dict[obj_name] += 1
 
 					for r in range(i, i+h):
 						for c in range(j, j+w):
 							occupied[r][c] = True
 							grid[r][c] = value["id"]
 
+		# print(obj_num_dict)
+		# print("\n")
 		return grid, room_graph
 
 

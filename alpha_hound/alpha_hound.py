@@ -24,14 +24,17 @@ class Hound(gym.Env):
 		# 			container locations as observation.
 		self.__env_type = env
 		init_env = env()
-		self.__reward_callback=None
 		self.__grid, self.__scene_graph = init_env.build_env(seed = self.__current_step)
+		# self.__grid, self.__scene_graph = init_env.build_env()
 		self.__scene_parent = scene_parent
 		self.__containers_list = [edge[1] for edge in self.__scene_graph.edges(self.__scene_parent)] # need to change this when adding high-level building node
 		self.__cont_locations = [self.__scene_graph.nodes[container]["location"] for container in self.__containers_list]
 		self.__num_containers = len(self.__containers_list)
 		self.__target_obj = target_obj
 		self.__grid_shape = np.shape(self.__grid)
+
+		# self.__grid_set = set()
+		# self.__grid_set.add(tuple(map(tuple, self.__grid)))
 
 		np.random.seed(seed = self.__current_step)
 		self.__use_dist = use_dist
@@ -44,6 +47,8 @@ class Hound(gym.Env):
 				self.__start_pos[1] = np.random.randint(0, self.__grid_shape[1])
 			else:
 				break
+
+		# print(self.__start_pos)
 
 		self.__curr_pos = self.__start_pos
 		self.__num_cont_visited = 0
@@ -62,10 +67,17 @@ class Hound(gym.Env):
 		self.__curr_pos = self.__start_pos
 		init_env = self.__env_type()
 		self.__grid, self.__scene_graph = init_env.build_env(seed = self.__current_step)
+		# self.__grid, self.__scene_graph = init_env.build_env()
 		self.__containers_list = [edge[1] for edge in self.__scene_graph.edges(self.__scene_parent)]
 		self.__num_containers = len(self.__containers_list)
 		self.__cont_locations = [self.__scene_graph.nodes[container]["location"] for container in self.__containers_list]
 		self.__grid_shape = np.shape(self.__grid)
+
+		# print(np.array(self.__grid))
+		# if tuple(map(tuple, self.__grid)) in self.__grid_set:	
+		# 	print("BAD")
+		# else:
+		# 	self.__grid_set.add(tuple(map(tuple, self.__grid)))
 
 		np.random.seed(seed = self.__current_step)
 		self.__start_pos[0] = np.random.randint(0, self.__grid_shape[0])
@@ -77,6 +89,10 @@ class Hound(gym.Env):
 				self.__start_pos[1] = np.random.randint(0, self.__grid_shape[1])
 			else:
 				break
+
+		# print(self.__start_pos)
+
+
 		self.__curr_pos = self.__start_pos
 		self.__num_cont_visited = 0
 		self.__grid[self.__curr_pos[0]][self.__curr_pos[1]] = -1 # Initialize agent on grid.
@@ -107,7 +123,9 @@ class Hound(gym.Env):
 		# if action in self.__actions_taken and action != self.__num_containers:
 		# print(type(action))
 		# print(action)
-		if action in self.__actions_taken and self.__num_containers not in self.__actions_taken:
+		# if action in self.__actions_taken and self.__num_containers not in self.__actions_taken:
+		if (action in self.__actions_taken and action < self.__num_containers) or (self.__num_cont_visited == 1 and action == self.__num_containers):	
+			# print("piss")
 			reward -= 1
 		# else:
 		# 	reward += 0.05
@@ -115,6 +133,7 @@ class Hound(gym.Env):
 		self.__actions_taken.add(action)
 
 		if action < self.__num_containers and self.__num_containers not in self.__actions_taken:
+		# if action < self.__num_containers:
 			location = self.__cont_locations[action]
 			# Check that there is no confusion about which container is being picked.
 			assert location == self.__scene_graph.nodes[self.__containers_list[action]]["location"]
@@ -129,7 +148,9 @@ class Hound(gym.Env):
 			
 			
 			# TODO: Investigate tweaking penalties for removing occlusion and path planning
-			if self.__use_dist: reward -= 0.02 * len(path)
+			if self.__use_dist: 
+				# print("boobs")
+				reward -= 0.02 * (len(path) - 1)
 			# reward -= cost
 
 			remove_obj = []
@@ -148,8 +169,9 @@ class Hound(gym.Env):
 				self.__scene_graph.remove_nodes_from(remove_obj)
 	
 		# TODO: Investigate using number of target objects as terminal state.
-		# if self.__num_cont_visited == self.__num_containers or action == self.__num_containers:
-		if self.__num_cont_visited == 10:
+		if self.__num_cont_visited == self.__num_containers or action == self.__num_containers:
+		# if self.__num_cont_visited == 10:
+		# else:
 			done = True
 
 		flattened_grid = (np.ndarray.flatten(np.array(self.__grid))).tolist()
